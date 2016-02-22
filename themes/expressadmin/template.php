@@ -418,3 +418,11 @@ function expressadmin_form_alter(&$form, &$form_state, $form_id) {
     $form['title']['#description'] = '<div class="unique-node-path">Node path: node/' . $form['nid']['#value'] . '</div>';
   }
 }
+/**
+ * Implements hook_menu_breadcrumb_alter().
+ * Show site name as home breadcrumb item.
+ */
+function expressadmin_menu_breadcrumb_alter(&$active_trail, $item) {
+  $site_name = variable_get('site_name', '');
+  $active_trail[0]['title'] = $site_name;
+}
