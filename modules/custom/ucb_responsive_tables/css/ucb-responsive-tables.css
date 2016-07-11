@@ -1,0 +1,6 @@
+b.tablesaw-cell-label { font-weight: 600; }
+
+table.tablesaw-stack tbody tr { border: none; }
+
+@media (max-width: 39.9375em) { table.tablesaw-stack tbody td { border: none; }
+  table.tablesaw-stack tbody tr { border-bottom: 1px solid #e7e7e7; } }

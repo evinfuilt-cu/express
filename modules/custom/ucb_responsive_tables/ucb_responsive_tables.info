@@ -1,0 +1,9 @@
+name = Responsive Tables
+core = 7.x
+description = Provides functionality to make simple tables responsive using the TableSaw library.
+package = Express
+scripts[] = js/ucb-responsive-tables.js
+scripts[] = js/tablesaw-init.js
+scripts[] = js/tablesaw.stackonly.js
+stylesheets[all][] = css/tablesaw.stackonly.css
+stylesheets[all][] = css/ucb-responsive-tables.css
