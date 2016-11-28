@@ -611,6 +611,25 @@ function cu_core_update_7016() {
 }
 
 /**
+ * Disable, uninstall LDAP modules, and enable simple_ldap modules.
+ */
+function cu_core_update_7017() {
+
+  // Disable LDAP modules including ldap feature.
+  if (module_exists('ldap_authentication')) {
+    module_disable(array('ldap_authentication', 'ldap_servers', 'ldap_user', 'cu_ldap'));
+    drupal_uninstall_modules(array('ldap_authentication', 'ldap_servers', 'ldap_user', 'cu_ldap'));
+  }
+
+  // Enable new LDAP modules.
+  module_enable(array('cu_ldap', 'simple_ldap', 'simple_ldap_user'));
+
+  // Run for every db update.
+  cu_core_express_update('7017');
+
+}
+
+/**
  * Revert features by passing features in an array.
  */
 function cu_core_revert_features($features = NULL) {
