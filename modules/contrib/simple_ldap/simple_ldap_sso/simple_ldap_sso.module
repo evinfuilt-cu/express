@@ -74,6 +74,15 @@ function simple_ldap_sso_init() {
 
   // If we got this far, the session is valid in LDAP. Mark it so.
   simple_ldap_sso_session_is_valid();
+
+  // If the user needs syncing, do it now.
+  if (simple_ldap_sso_user_needs_sync()
+    // Only sync the user if the source is LDAP, to avoid writing to LDAP.
+    && simple_ldap_user_variable_get('simple_ldap_user_source') == 'ldap') {
+      // Load up the full user object so that fields are present.
+      $account = user_load($user->uid);
+      simple_ldap_user_sync_user($account);
+  }
 }
 
 /**
