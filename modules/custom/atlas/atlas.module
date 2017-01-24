@@ -23,6 +23,15 @@ function atlas_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
   );
+
+  $items['admin/config/development/atlas/delete'] = array(
+    'title' => 'Delete Instance',
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('atlas_delete'),
+    'access arguments' => array('administer modules'),
+    'weight' => 0,
+  );
   
   return $items;
 }
@@ -55,7 +64,6 @@ function atlas_admin_settings() {
     'installed' => t('Installed'),
     'launching' => t('Launching'),
     'take_down' => t('Take Down Site'),
-    'delete' => t('Delete'),
   );
 
   // If site is Available or Launched, add that option. You cannot go to those
@@ -229,6 +237,58 @@ function atlas_admin_settings_submit($form, &$form_state) {
 }
 
 /**
+ * Page callback for admin/config/development/atlas.
+ */
+function atlas_delete($form, &$form_state) {
+  // Check the base requirements to interact with Atlas.
+  // We need Atlas to be up.
+  if (!atlas_up()) {
+    drupal_set_message(t("Atlas must be up to configure these settings"), 'error');
+    return;
+  }
+
+  // We need to know the 'atlas_id'.
+  $atlas_id = variable_get('atlas_id', FALSE);
+
+  if (!$atlas_id) {
+    drupal_set_message(t("Atlas ID is not configured."), 'error');
+    return;
+  }
+
+  $site_array = atlas_api_request('sites', $atlas_id);
+
+  $form['atlas_id'] = array(
+    '#type' => 'hidden',
+    '#title' => t('Atlas ID'),
+    '#default_value' => $atlas_id,
+  );
+
+  $form['atlas_etag'] = array(
+    '#type' => 'hidden',
+    '#title' => t('eTag'),
+    '#default_value' => $site_array['_etag'],
+  );
+
+  $form['html'] = array(
+    '#type' => 'markup',
+    '#markup' => '<p>This will permanently remove the site.</p>',
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Delete')
+  );
+
+  return $form;
+}
+
+function atlas_delete_submit($form, &$form_state) {
+  $request_data['_etag'] = $form_state['values']['atlas_etag'];
+  $form_state['redirect'] = '';
+  atlas_api_request('sites', $form['values']['atlas_id'], 'DELETE', $request_data);
+}
+
+/**
  * Determine if Atlas is up. Included a 5 second timeout.
  *
  * @return bool
@@ -323,6 +383,9 @@ function atlas_api_request($resource, $query = NULL, $method = 'GET', $data = NU
       $json_array = drupal_json_decode($response->data);
       return $json_array;
     }
+  }
+  elseif ($response->code = 204) {
+    drupal_set_message('Deletion request accepted.');
   }
   // If error property exists in the response object.
   elseif (property_exists($response, 'error')) {
