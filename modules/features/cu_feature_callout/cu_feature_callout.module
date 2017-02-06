@@ -40,6 +40,8 @@ function cu_feature_callout_preprocess_entity(&$vars) {
     // Get the number of columns for formatting.
     $columns = $vars['content']['field_callout_columns']['#items'][0]['value'];
     $size = $vars['content']['field_callout_image_size']['#items'][0]['value'];
+    $style = isset($vars['content']['field_callout_style']) ? $vars['content']['field_callout_style']['#items'][0]['value'] : 'stacked';
+    $style = ($columns == 1) ? 'stacked' : $style;
     // Find all the field_collection_items.
     $children = element_children($vars['content']['field_callouts']);
     $i = 0;
@@ -80,6 +82,7 @@ function cu_feature_callout_preprocess_entity(&$vars) {
           '#alt' => $fc_item['field_callout_image']['#items'][0]['alt'],
         );
         $image = drupal_render($build);
+        $image_url = image_style_url($size, $image_uri);
       }
 
       // Remove title if link url field was used but link title field was not.
@@ -104,6 +107,7 @@ function cu_feature_callout_preprocess_entity(&$vars) {
         }
 
         if (isset($title)) {
+          $title = '<span>' . $title . '</span>';
           $title = '<' . $grid_header . ' class="feature-callout-title">' . l($title, $url['url'], array('html' => TRUE, 'query' => $url['query'], 'fragment' => $url['fragment'])) . '</' . $grid_header . '>';
         } else {
           $title = '';
@@ -112,11 +116,12 @@ function cu_feature_callout_preprocess_entity(&$vars) {
           $image = l($image, $url['url'], array('html' => TRUE, 'query' => $url['query'], 'fragment' => $url['fragment']));
         } else {
           $image = '';
+          $image_url = '';
         }
       }
       else {
         if (isset($title)) {
-          $title = '<' . $grid_header . ' class="feature-callout-title">' . $title . '</' . $grid_header . '>';
+          $title = '<' . $grid_header . ' class="feature-callout-title"><span>' . $title . '</span></' . $grid_header . '>';
         } else {
           $title = '';
         }
@@ -124,6 +129,24 @@ function cu_feature_callout_preprocess_entity(&$vars) {
 
       // Create an array of items.
       $items[$i]['#markup'] = '<div class="feature-callout-item feature-callout-column-' . $column_count . ' clearfix">' . $image . '<div class="feature-callout-text clearfix">' . $title . '<div class="field-type-text-long">' . $text . '</div></div></div>';
+
+      $variables['column_count'] = $column_count;
+      $variables['title'] = $title;
+      $variables['image'] = $image;
+      $variables['image_url'] = $image_url;
+      $variables['text'] = $text;
+
+
+      $column_classes[1] = 'col-lg-12 col-md-12 col-sm-12 col-xs-12';
+      $column_classes[2] = 'col-lg-6 col-md-6 col-sm-6 col-xs-12 col-lg-clear-after-2 col-md-clear-after-2 col-sm-clear-after-2';
+      $column_classes[3] = 'col-lg-4 col-md-4 col-sm-6 col-xs-12 col-lg-clear-after-3 col-md-clear-after-3 col-sm-clear-after-2';
+      $column_classes[4] = 'col-lg-3 col-md-3 col-sm-6 col-xs-12 col-lg-clear-after-4 col-md-clear-after-4 col-sm-clear-after-2';
+      $column_classes[5] = 'col-lg-5c col-md-5c col-sm-6 col-xs-12 col-lg-clear-after-5 col-md-clear-after-5 col-sm-clear-after-2';
+
+      $variables['column_classes'] = $column_classes[$columns];
+
+      $items[$i]['#markup'] = theme('cu_feature_callout_' . $style, $variables);
+
 
       if ($column_count == $columns) {
         $column_count = 0;
@@ -136,9 +159,12 @@ function cu_feature_callout_preprocess_entity(&$vars) {
     unset($vars['content']['field_callouts']);
     unset($vars['content']['field_callout_columns']);
     unset($vars['content']['field_callout_image_size']);
+    unset($vars['content']['field_callout_style']);
     $classes[] = 'feature-callout';
     $classes[] = 'feature-callout-columns-' . $columns;
+    $classes[] = 'feature-callout-style-' . $style;
     $classes[] = 'clearfix';
+    $classes[] = 'row';
     $classes = join(' ', $classes);
     if (isset($items)) {
       // Generate an item_list of our items and add to $content.
@@ -147,5 +173,32 @@ function cu_feature_callout_preprocess_entity(&$vars) {
       $vars['content']['field_callouts']['#suffix'] = '</div>';
 
     }
+  }
+}
+
+function cu_feature_callout_theme(&$existing, $type, $theme, $path) {
+  $registry = array();
+  $template_dir = drupal_get_path('module', 'cu_feature_callout') . '/templates';
+  $registry['cu_feature_callout_stacked'] = array(
+    'template' => 'cu_feature_callout_stacked',
+    'path' => $template_dir,
+    'render element' => 'elements',
+  );
+  $registry['cu_feature_callout_overlay'] = array(
+    'template' => 'cu_feature_callout_overlay',
+    'path' => $template_dir,
+    'render element' => 'elements',
+  );
+  return $registry;
+}
+
+function cu_feature_callout_form_bean_form_alter(&$form, &$form_state, $form_id) {
+
+  if ($form['bean']['#value']->type == 'feature_callout') {
+    $form['field_callout_style']['#states'] = array(
+      'invisible' => array(
+    	   ':input[name="field_callout_columns[und]"]' => array('value' => '1'),
+      ),
+    );
   }
 }

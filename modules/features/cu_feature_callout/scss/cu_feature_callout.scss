@@ -1,5 +1,3 @@
-@import "zen";
-
 @mixin clearfloats {
   &:after {
     content: "";
@@ -8,149 +6,6 @@
   }
 }
 
-$zen-gutter-width:  40px;
-.feature-callout {
-  @include zen-grid-container();
-  margin-right:-20px;
-  margin-left:-20px;
-}
-/* Grid/Column sizing */
-$zen-column-count:  1;
-.feature-callout-item {
-  @include zen-grid-item(1,1);
-  clear: both;
-  margin-bottom: 20px;
-  img {
-    float:none;
-    margin:0 0 10px 0;
-    width:100%;
-    height: auto;
-  }
-  .feature-callout-text {
-    @include clearfloats;
-    overflow: hidden;
-  }
-}
-@media screen and (min-width: 760px) {
-  .feature-callout-item {
-    clear: none;
-  }
-  .feature-callout-item img {
-    display: block;
-    margin-bottom: 10px;
-    width:100%;
-    height: auto;
-    float: none;
-  }
-  .feature-callout-columns-1 {
-    $zen-column-count:  1;
-    img {
-      float:left;
-      margin:0 10px 0 0;
-      width:50px;
-      height: auto;
-    }
-    .feature-callout-text {
-      @include clearfloats;
-    }
-    .feature-callout-column-1 {
-      @include zen-grid-item(1,1);
-      clear: both;
-      margin-bottom: 20px;
-    }
-  }
-  .feature-callout-columns-2 {
-    $zen-column-count:  2;
-    .feature-callout-column-1 {
-      @include zen-grid-item(1,1);
-      clear: both;
-    }
-    .feature-callout-column-2 {
-      @include zen-grid-item(1,2);
-    }
-  }
-  .feature-callout-columns-3 {
-    $zen-column-count:  3;
-    .feature-callout-column-1 {
-      @include zen-grid-item(1,1);
-      clear: both;
-    }
-    .feature-callout-column-2 {
-      @include zen-grid-item(1,2);
-    }
-    .feature-callout-column-3 {
-      @include zen-grid-item(1,3);
-    }
-  }
-  .feature-callout-columns-4 {
-    $zen-column-count:  2;
-    .feature-callout-column-1,
-    .feature-callout-column-3 {
-      @include zen-grid-item(1,1);
-      clear: both;
-    }
-    .feature-callout-column-2,
-    .feature-callout-column-4 {
-      @include zen-grid-item(1,2);
-    }
-  }
-  .feature-callout-columns-5 {
-    $zen-column-count:  2;
-    .feature-callout-column-1,
-    .feature-callout-column-3,
-    .feature-callout-column-5 {
-      @include zen-grid-item(1,1);
-      clear: both;
-    }
-    .feature-callout-column-2,
-    .feature-callout-column-4 {
-      @include zen-grid-item(1,2);
-    }
-
-  }
-}
-
-@media screen and (min-width: 960px) {
-  .feature-callout-columns-4 {
-    $zen-column-count:  4;
-    .feature-callout-column-1 {
-      @include zen-grid-item(1,1);
-      clear: both;
-    }
-    .feature-callout-column-2 {
-      @include zen-grid-item(1,2);
-    }
-    .feature-callout-column-3 {
-      @include zen-grid-item(1,3);
-      clear:none;
-    }
-    .feature-callout-column-4 {
-      @include zen-grid-item(1,4);
-    }
-  }
-  .feature-callout-columns-5 {
-    $zen-column-count:  5;
-    .feature-callout-column-1 {
-      @include zen-grid-item(1,1);
-      clear: both;
-    }
-    .feature-callout-column-2 {
-      @include zen-grid-item(1,2);
-    }
-    .feature-callout-column-3 {
-      @include zen-grid-item(1,3);
-      clear:none;
-    }
-    .feature-callout-column-4 {
-      @include zen-grid-item(1,4);
-    }
-    .feature-callout-column-5 {
-      @include zen-grid-item(1,5);
-      clear:none;
-    }
-  }
-
-}
 /* TYPOGRAPHY */
 
 h2.feature-callout-title,
@@ -158,7 +13,23 @@ h3.feature-callout-title {
   font-size: 110%;
 }
 
+.feature-callout-item-content {
+  margin-bottom: 20px;
+}
+
 /* Image sizing */
+.feature-callout-columns-1 {
+  img {
+    float:left;
+    margin:0 10px 10px 0;
+    width:75px;
+    height: auto;
+  }
+  .feature-callout-text {
+    @include clearfloats;
+    overflow: hidden;
+  }
+}
 @media screen and (min-width: 720px) {
   .feature-callout-columns-1 {
     img {
@@ -171,5 +42,138 @@ h3.feature-callout-title {
     img {
       width:120px;
     }
+  }
+}
+
+
+
+/* Stacked */
+.feature-callout-style-stacked {
+  .feature-callout-item-content {
+    padding-top: 10px;
+  }
+  .feature-callout-item {
+    margin-bottom: 20px;
+  }
+}
+
+/* Overlay */
+.feature-callout-style-overlay {
+  .feature-callout-item-content {
+    padding-top: 10px;
+  }
+  .feature-callout-item {
+    margin-bottom: 40px;
+  }
+}
+.feature-callout-item-overlay {
+
+  margin-bottom: 0;
+  position: relative;
+  overflow: hidden;
+  position: relative;
+  h2, h3 {
+    margin: 0;
+  }
+
+  .feature-callout-text {
+
+    a {
+      color:#fff;
+      display: block;
+      position:absolute;
+      top: 0;
+      left:0;
+      right:0;
+      bottom:0;
+      border-bottom: 10px solid #007BC8;
+      overflow: hidden;
+    }
+    span {
+      display: block;
+      position:absolute;
+      bottom: 0;
+      left:0;
+      right:0;
+      padding:10px;
+      color:#fff;
+      background: rgba(0,0,0,.65);
+
+    }
+    a span {
+      transition: all .25s ease-in-out;
+      -webkit-transition: all .25s ease-in-out;
+      -moz-transition: all .25s ease-in-out;
+    }
+    a:hover {
+      border-bottom: 10px solid #cfb87c;
+      span {
+        background: rgba(0,0,0,.85);
+      }
+    }
+  }
+}
+
+// Clearing columns
+@media screen and (min-width: 768px) and (max-width: 959px) {
+  .col-sm-clear-after-1:nth-child(n+1) {
+    clear:both;
+  }
+  .col-sm-clear-after-2:nth-child(2n+1) {
+    clear:both;
+  }
+  .col-sm-clear-after-3:nth-child(3n+1) {
+    clear:both;
+  }
+  .col-sm-clear-after-4:nth-child(4n+1) {
+    clear:both;
+  }
+  .col-sm-clear-after-5:nth-child(5n+1) {
+    clear:both;
+  }
+  .col-sm-clear-after-6:nth-child(6n+1) {
+    clear:both;
+  }
+}
+
+@media screen and (min-width: 960px) and (max-width: 1199px) {
+  .col-md-clear-after-1:nth-child(n+1) {
+    clear:both;
+  }
+  .col-md-clear-after-2:nth-child(2n+1) {
+    clear:both;
+  }
+  .col-md-clear-after-3:nth-child(3n+1) {
+    clear:both;
+  }
+  .col-md-clear-after-4:nth-child(4n+1) {
+    clear:both;
+  }
+  .col-md-clear-after-5:nth-child(5n+1) {
+    clear:both;
+  }
+  .col-md-clear-after-6:nth-child(6n+1) {
+    clear:both;
+  }
+}
+
+@media screen and (min-width:1200px) {
+  .col-lg-clear-after-1:nth-child(n+1) {
+    clear:both;
+  }
+  .col-lg-clear-after-2:nth-child(2n+1) {
+    clear:both;
+  }
+  .col-lg-clear-after-3:nth-child(3n+1) {
+    clear:both;
+  }
+  .col-lg-clear-after-4:nth-child(4n+1) {
+    clear:both;
+  }
+  .col-lg-clear-after-5:nth-child(5n+1) {
+    clear:both;
+  }
+  .col-lg-clear-after-6:nth-child(6n+1) {
+    clear:both;
   }
 }
