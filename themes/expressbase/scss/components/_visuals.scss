@@ -483,7 +483,7 @@ a .icon-color-gray {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center center;
-  height:240px;
+  //height:240px;
   position: relative;
   padding:0;
   @include clearfloats;
@@ -491,11 +491,11 @@ a .icon-color-gray {
 
 .feature-layout-title-image-overlay {
   color:#fff;
-  position: absolute;
+  //position: absolute;
   bottom: 0;
   left:0;
   width:100%;
-  padding:60px 20px 20px;
+  padding:180px 20px 20px;
 }
 .feature-layout-title-image-overlay h1 {
   font-size: 140%;
@@ -506,10 +506,10 @@ a .icon-color-gray {
 }
 @media screen and (min-width:768px) {
   .feature-layout-title-image {
-    height:360px;
+    //height:360px;
   }
   .feature-layout-title-image-overlay {
-    padding: 100px 20px 30px;
+    padding: 240px 20px 30px;
   }
   .feature-layout-title-image-overlay h1 {
     font-size: 200%;
@@ -517,16 +517,13 @@ a .icon-color-gray {
 }
 @media screen and (min-width:960px) {
   .feature-layout-title-image {
-    height:480px;
-    transition: height 1s ease-in-out;
-    -webkit-transition: height 1s ease-in-out;
-    -moz-transition: height 1s ease-in-out;
+    //height:480px;
   }
   .feature-layout-title-image.layout-title-image-small {
-    height:320px;
+    //height:320px;
   }
   .feature-layout-title-image-overlay {
-    padding: 200px 20px 30px;
+    padding: 360px 20px 30px;
   }
   .feature-layout-title-image-overlay h1 {
     font-size: 240%;
@@ -534,13 +531,10 @@ a .icon-color-gray {
 }
 @media screen and (min-width:1200px) {
   .feature-layout-title-image {
-    height:600px;
-    transition: height 1s ease-in-out;
-    -webkit-transition: height 1s ease-in-out;
-    -moz-transition: height 1s ease-in-out;
+    //height:600px;
   }
   .feature-layout-title-image.layout-title-image-small {
-    height:320px;
+    //height:320px;
   }
 }
 .has-feature-title-image h1#page-title {
