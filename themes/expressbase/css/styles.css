@@ -806,19 +806,24 @@ hr { margin: 0 0 20px 0; padding: 0; border: none; height: 1px; background: #e0e
 #cboxTitle { font-size: 11px; }
 
 /* Layout Title Image */
-.feature-layout-title-image { background-color: #000; background-size: cover; background-repeat: no-repeat; background-position: center center; position: relative; padding: 0; }
+.feature-layout-title-image { background-color: #000; background-size: cover; background-repeat: no-repeat; background-position: center center; position: relative; padding: 0; padding-top: 180px; }
 .feature-layout-title-image:after { content: ""; display: table; clear: both; }
 
-.feature-layout-title-image-overlay { color: #fff; bottom: 0; left: 0; width: 100%; padding: 180px 20px 20px; }
+.feature-layout-title-image-overlay { color: #fff; bottom: 0; left: 0; width: 100%; padding: 60px 20px 20px; }
 
 .feature-layout-title-image-overlay h1 { font-size: 140%; font-weight: 200; }
 
 .headings-bold .feature-layout-title-image-overlay h1 { font-weight: 700; }
 
-@media screen and (min-width: 768px) { .feature-layout-title-image-overlay { padding: 240px 20px 30px; }
+@media screen and (min-width: 768px) { .feature-layout-title-image { padding-top: 220px; }
+  .feature-layout-title-image-overlay { padding: 100px 20px 30px; }
   .feature-layout-title-image-overlay h1 { font-size: 200%; } }
-@media screen and (min-width: 960px) { .feature-layout-title-image-overlay { padding: 360px 20px 30px; }
+@media screen and (min-width: 960px) { .feature-layout-title-image { padding-top: 220px; }
+  .feature-layout-title-image.layout-title-image-small { padding-top: 180px; }
+  .feature-layout-title-image-overlay { padding: 200px 20px 30px; }
   .feature-layout-title-image-overlay h1 { font-size: 240%; } }
+@media screen and (min-width: 1200px) { .feature-layout-title-image { padding-top: 360px; }
+  .feature-layout-title-image.layout-title-image-small, .layout-boxed .feature-layout-title-image { padding-top: 220px; } }
 .has-feature-title-image h1#page-title { display: none; }
 
 @media screen and (min-width: 640px) { .title-image-byline { font-size: 125%; } }

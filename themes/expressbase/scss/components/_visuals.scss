@@ -487,6 +487,7 @@ a .icon-color-gray {
   position: relative;
   padding:0;
   @include clearfloats;
+  padding-top:180px;
 }
 
 .feature-layout-title-image-overlay {
@@ -495,7 +496,7 @@ a .icon-color-gray {
   bottom: 0;
   left:0;
   width:100%;
-  padding:180px 20px 20px;
+  padding:60px 20px 20px;
 }
 .feature-layout-title-image-overlay h1 {
   font-size: 140%;
@@ -507,9 +508,10 @@ a .icon-color-gray {
 @media screen and (min-width:768px) {
   .feature-layout-title-image {
     //height:360px;
+    padding-top:220px;
   }
   .feature-layout-title-image-overlay {
-    padding: 240px 20px 30px;
+    padding: 100px 20px 30px;
   }
   .feature-layout-title-image-overlay h1 {
     font-size: 200%;
@@ -518,12 +520,15 @@ a .icon-color-gray {
 @media screen and (min-width:960px) {
   .feature-layout-title-image {
     //height:480px;
+    padding-top:220px;
   }
   .feature-layout-title-image.layout-title-image-small {
     //height:320px;
+    padding-top:180px;
+
   }
   .feature-layout-title-image-overlay {
-    padding: 360px 20px 30px;
+    padding: 200px 20px 30px;
   }
   .feature-layout-title-image-overlay h1 {
     font-size: 240%;
@@ -532,9 +537,12 @@ a .icon-color-gray {
 @media screen and (min-width:1200px) {
   .feature-layout-title-image {
     //height:600px;
+    padding-top:360px;
   }
-  .feature-layout-title-image.layout-title-image-small {
+  .feature-layout-title-image.layout-title-image-small,
+  .layout-boxed .feature-layout-title-image {
     //height:320px;
+    padding-top:220px;
   }
 }
 .has-feature-title-image h1#page-title {
