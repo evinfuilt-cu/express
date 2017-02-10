@@ -131,6 +131,9 @@ function cu_tracking_pixel_permission() {
     'view tracking pixels overview' => array(
       'title' => t('View Tracking Pixels Overview'),
     ),
+    'publish tracking pixels' => array(
+      'title' => t('Publish Tracking Pixels'),
+    ),
   );
 }
 
@@ -162,36 +165,45 @@ function cu_tracking_pixel_load($id) {
  */
 function cu_tracking_pixel_page_alter(&$page) {
   $path = current_path();
-  // Look for tracking pixels at current path
-  $query = db_select('tracking_pixel', 'tr');
-  $query->fields('tr', array('id', 'name', 'path', 'status', 'position'));
-  $query->condition('tr.status', 1, '=');
-  $query->condition('tr.path', $path, '=');
-  // Join tracking code table
-  $query->join('field_data_field_tracking_code', 'code', 'code.entity_id = tr.id');
-  $query->fields('code', array('field_tracking_code_value'));
-  $pixels = $query->execute();
-  $results = array();
-  // Check for results
-  while($pixel = $pixels->fetchAssoc()) {
-    $results[] = $pixel;
-  }
-  if (!empty($results)){
-    // Tracking pixel containers
-    $page['page_top']['tracking_pixels'] = array();
-    $page['page_bottom']['tracking_pixels'] = array();
+  if (!path_is_admin($path)) {
+    $paths = array();
+    $paths[] = '<all>';
+    $paths[] = $path;
+    // Look for tracking pixels at current path
+    $query = db_select('tracking_pixel', 'tr');
+    $query->fields('tr', array('id', 'name', 'path', 'status', 'position'));
+    $query->condition('tr.status', 1, '=');
+    $query->condition('tr.path', $paths, 'IN');
+    // Look for sitewide pixels
+    // $db_or = db_or();
+    // $db_or->condition('tr.path', '<all>', '=');
+    // $query->condition($db_or);
+    // Join tracking code table
+    $query->join('field_data_field_tracking_code', 'code', 'code.entity_id = tr.id');
+    $query->fields('code', array('field_tracking_code_value'));
+    $pixels = $query->execute();
+    $results = array();
+    // Check for results
+    while($pixel = $pixels->fetchAssoc()) {
+      $results[] = $pixel;
+    }
+    if (!empty($results)){
+      // Tracking pixel containers
+      $page['page_top']['tracking_pixels'] = array();
+      $page['page_bottom']['tracking_pixels'] = array();
 
-    $page['page_top']['tracking_pixels']['#prefix'] = '<div class="tracking-pixels-top" style="display:none;">';
-    $page['page_bottom']['tracking_pixels']['#prefix'] = '<div class="tracking-pixels-top" style="display:none;">';
+      $page['page_top']['tracking_pixels']['#prefix'] = '<div class="tracking-pixels-top" style="display:none;">';
+      $page['page_bottom']['tracking_pixels']['#prefix'] = '<div class="tracking-pixels-top" style="display:none;">';
 
-    $page['page_top']['tracking_pixels']['#suffix'] = '</div>';
-    $page['page_bottom']['tracking_pixels']['#suffix'] = '</div>';
+      $page['page_top']['tracking_pixels']['#suffix'] = '</div>';
+      $page['page_bottom']['tracking_pixels']['#suffix'] = '</div>';
 
-    // Add tracking pixels
-    foreach ($results as $result) {
-      $id = $result['id'];
-      $position = 'page_' . $result['position'];
-      $page[$position]['tracking_pixels'][$id]['#markup'] = base64_decode($result['field_tracking_code_value']);
+      // Add tracking pixels
+      foreach ($results as $result) {
+        $id = $result['id'];
+        $position = 'page_' . $result['position'];
+        $page[$position]['tracking_pixels'][$id]['#markup'] = base64_decode($result['field_tracking_code_value']);
+      }
     }
   }
 }
@@ -209,18 +221,84 @@ function cu_tracking_pixel_secure_permissions($role) {
     ),
     'administrator' => array(
       'view tracking pixels overview',
+      'administer tracking pixels',
+      'publish tracking pixels',
     ),
     'content_editor' => array(
     ),
     'developer' => array(
       'administer tracking pixels',
+      'publish tracking pixels',
     ),
     'site_owner' => array(
       'view tracking pixels overview',
+      'administer tracking pixels',
     ),
   );
 
   if (isset($permissions[$role])) {
     return $permissions[$role];
+  }
+}
+
+/**
+ * Sends invitation email with token login link.
+ */
+function _cu_tracking_pixel_send_mail($pixel_id) {
+  global $base_url;
+  // http://express.local/express2/admin/content/trackingpixels/1/edit
+  $link = $base_url . '/admin/content/trackingpixels/' . $pixel_id . '/edit';
+  $site_name = variable_get('site_name', '');
+  $from = _cu_tracking_pixel_from_mail();
+  $to = variable_get('cu_tracking_pixel_use_universal_to_email', NULL);
+
+  if (!$to) {
+    drupal_set_message('No email address has been configured', 'error');
+  }
+  else {
+    $params = array(
+      'link' => $link,
+      'site_name' => $site_name,
+      'subject' => t('Tracking pixel created on !site_name website', array('!site_name' => $site_name)),
+      'body' => t('A tracking pixel created on !site_name website. Visit !link to publish this tracking pixel.', array('!site_name' => $site_name, '!link' => $link)),
+    );
+    // Send mail to user who was invited.
+    $result = drupal_mail('cu_tracking_pixel', 'cu_tracking_pixel_token', $to, language_default(), $params, $from, TRUE);
+    watchdog('cu_tracking_pixel', 'Tracking Pixel Submitted', $result);
+  }
+
+
+}
+
+function _cu_tracking_pixel_from_mail($uid = NULL) {
+  // Needs to be configurable.
+  if (variable_get('cu_tracking_pixel_use_universal_from_email', NULL)) {
+    return variable_get('cu_tracking_pixel_universal_from_email', NULL);
+  }
+  else {
+    // Get logged in user if none passed.
+    if ($uid === NULL) {
+      global $user;
+    }
+    else {
+      $user = user_load($uid);
+    }
+    return $user->mail;
+  }
+}
+
+/**
+ * Implements hook_mail().
+ */
+function cu_tracking_pixel_mail($key, &$message, $params) {
+  switch ($key) {
+    // Invite email.
+    case 'cu_tracking_pixel_token':
+      $message['body'] = array();
+      $message['body'][] = $params['body'];
+      $message['subject'] = $params['subject'];
+      break;
+
+
   }
 }

@@ -30,6 +30,10 @@ function tracking_pixel_form($form, &$form_state, $tracking_pixel = NULL) {
     $code = $form['field_tracking_code'][LANGUAGE_NONE][0]['value']['#default_value'];
     $form['field_tracking_code'][LANGUAGE_NONE][0]['value']['#default_value'] = base64_decode($code);
   }
+  if (isset($tracking_pixel->status) && ($tracking_pixel->status == 1) && !user_access('publish tracking pixels')) {
+    $form['field_tracking_code']['#disabled'] = TRUE;
+  }
+
   $options = array(
     'top' => 'Top',
     'bottom' => 'Bottom',
@@ -57,8 +61,14 @@ function tracking_pixel_form($form, &$form_state, $tracking_pixel = NULL) {
     '#title' => t('Published'),
     '#type' => 'checkbox',
 
-    '#default_value' => isset($tracking_pixel->status) ? $tracking_pixel->status : '1',
+    '#default_value' => isset($tracking_pixel->status) ? $tracking_pixel->status : '0',
   );
+  if (!user_access('publish tracking pixels')) {
+    $form['publish_settings']['status']['#disabled'] = TRUE;
+  }
+  //$form['#submit'][] = 'cu_tracking_pixel_email';
+
+  $form['field_tracking_path'][LANGUAGE_NONE][0]['#description'] = 'Use &lt;all&gt; to place a tracking pixel on every page, for example, retargeting pixels.';
   return $form;
 }
 
@@ -82,15 +92,20 @@ function tracking_pixel_form_validate($form, &$form_state) {
  * Submit handler for video entity form.
  */
 function tracking_pixel_form_submit($form, &$form_state) {
+  $is_new = FALSE;
+  // Get uid
+  global $user;
+  $uid = $user->uid;
   // Values saved to tracking_pixel table
   $values = array(
     'name' => $form_state['values']['field_tracking_name'][LANGUAGE_NONE][0]['value'],
     'path' => $form_state['values']['field_tracking_path'][LANGUAGE_NONE][0]['url'],
     'position' => $form_state['values']['position'],
     'status' => $form_state['values']['status'],
+    'uid' => $uid,
   );
   // See if the entity exists
-  if ($tracking_pixel = entity_load_single('tracking_pixel', $form['#entity']->id)) {
+  if (isset($form['#entity']->id) && ($tracking_pixel = entity_load_single('tracking_pixel', $form['#entity']->id))) {
     // Entity exists, add values just in case they have changed
     foreach ($values as $key => $value) {
       $tracking_pixel->$key = $value;
@@ -99,6 +114,7 @@ function tracking_pixel_form_submit($form, &$form_state) {
   else {
     // create new entity with values
     $tracking_pixel = entity_create('tracking_pixel', $values);
+    $is_new = TRUE;
   }
   // Update attached fields
   $tracking_pixel->field_tracking_name = $form_state['values']['field_tracking_name'];
@@ -113,6 +129,10 @@ function tracking_pixel_form_submit($form, &$form_state) {
 
   // Save entity and return to overview
   $tracking_pixel->save();
+  if ($is_new) {
+    _cu_tracking_pixel_send_mail($tracking_pixel->id);
+  }
+
   drupal_goto('admin/content/trackingpixels');
 }
 
