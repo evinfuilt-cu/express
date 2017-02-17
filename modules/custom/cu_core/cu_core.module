@@ -159,3 +159,14 @@ function cu_core_express_bean_list_groups($bundles) {
 
   return $bundles;
 }
+
+/**
+ * Implements hook_navbar_alter().
+ *
+ * Hide environment switch link.
+ */
+function cu_core_navbar_alter(&$items) {
+  if (!empty($items['environment_indicator'])) {
+    $items['environment_indicator']['#access'] = FALSE;
+  }
+}
